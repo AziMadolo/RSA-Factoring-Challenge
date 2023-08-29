@@ -1,0 +1,65 @@
+#!/usr/bin/python3
+
+import sys
+import random
+import time
+
+def is_probably_prime(n, k=20):
+    if n <= 1:
+        return False
+    if n <= 3:
+        return True
+    if n % 2 == 0:
+        return False
+
+    r, s = 0, n - 1
+    while s % 2 == 0:
+        r += 1
+        s //= 2
+
+    for _ in range(k):
+        a = random.randint(2, n - 1)
+        x = pow(a, s, n)
+        if x == 1 or x == n - 1:
+            continue
+        for _ in range(r - 1):
+            x = pow(x, 2, n)
+            if x == n - 1:
+                break
+        else:
+            return False
+
+    return True
+
+def find_prime_factors(num):
+    for i in range(2, num):
+        if num % i == 0 and is_probably_prime(i) and is_probably_prime(num // i):
+            return i, num // i
+    return None, None
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <file>")
+        sys.exit(1)
+
+    input_file = sys.argv[1]
+
+    try:
+        with open(input_file, 'r') as f:
+            num = int(f.readline().strip())
+    except FileNotFoundError:
+        print("File not found")
+        sys.exit(1)
+
+    start_time = time.time()
+
+    factor1, factor2 = find_prime_factors(num)
+
+    if factor1 is not None and factor2 is not None:
+        print(f"{num} = {factor1} * {factor2}")
+    else:
+        print("No prime factorization found")
+
+    if time.time() - start_time > 5:
+        print("Time limit exceeded")
+        sys.exit(1)
